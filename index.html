@@ -85,7 +85,7 @@
       resultPhotoResult.src = '';
       resultError.textContent = '';
       
-      fetch(`/search/data/${userInputText}.json`)
+      fetch(`/json-search/data/${userInputText}.json`)
         .then(response => response.json())
         .then(result => {
               resultTextResult.textContent = result.description;
@@ -95,11 +95,9 @@
           resultError.textContent = 'Ничего найти не удалось';
           })
         .finally(() => {
-          resultPhotoResult.onload = () => {
-            userBlockLoader.classList.add('hidden');
-            userBlockButton.disabled = false;
-            userBlockButton.classList.remove('hidden-text');
-          };
+          userBlockButton.disabled = false;
+          userBlockButton.classList.remove('hidden-text');
+          userBlockLoader.classList.add('hidden');
         });
     });
   </script>
