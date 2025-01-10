@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/Chalarangelo/mini.css/v3.0.1/dist/mini-default.min.css">
+    <style>
+      .user-block_form {
+        max-width: 400px;
+      }
+
+      .user-block_loader {
+        width: 22px;
+        height: 22px;
+        border: 5px dotted #f0050594;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        box-sizing: border-box;
+        animation: rotation 2s linear infinite;
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      } 
+
+      .hidden-text::after {
+        display: none;
+      }
+      
+      .hidden {
+        display: none;
+      }
+
+      .result_error {
+        color: brown;
+      }
+
+      .result_photo-result {
+        max-width: 400px;
+        max-height: 400px;
+      }
+    </style>
+</head>
+<body>
+  <form class="user-block user-block_form" method="get">
+    <input class="user-block user-block_input-text" placeholder="Искать здесь..." type="text">
+    <button class="user-block user-block_button" type="submit">
+      <div class="user-block user-block_loader hidden"></div>
+      Поиск
+    </button>
+  </form>
+  <div class="result">
+    <p class="result result_text-result"></p>
+    <img class="result result_photo-result" src="">
+    <div class="result result_error"></div>
+  </div>
+  <script>
+    const userBlockForm = document.querySelector('.user-block_form');
+    const userBlockInputText = document.querySelector('.user-block_input-text');
+    const userBlockButton = document.querySelector('.user-block_button');
+    const userBlockLoader = document.querySelector('.user-block_loader');
+    const resultTextResult = document.querySelector('.result_text-result');
+    const resultPhotoResult = document.querySelector('.result_photo-result');
+    const resultError = document.querySelector('.result_error');
+    
+    userBlockForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const userInputText = userBlockInputText.value;
+
+      if (userInputText.trim() === '') {
+        resultError.textContent = 'Введите поисковый запрос!';
+        return;
+      }
+      userBlockButton.disabled = true;
+      userBlockLoader.classList.remove('hidden');
+      userBlockButton.classList.add('hidden-text');
+      resultTextResult.textContent = '';
+      resultPhotoResult.src = '';
+      resultError.textContent = '';
+      
+      fetch(`/search/data/${userInputText}.json`)
+        .then(response => response.json())
+        .then(result => {
+              resultTextResult.textContent = result.description;
+              resultPhotoResult.src = result.imageUrl;
+            })
+        .catch((error) => {
+          resultError.textContent = 'Ничего найти не удалось';
+          })
+        .finally(() => {
+          resultPhotoResult.onload = () => {
+            userBlockLoader.classList.add('hidden');
+            userBlockButton.disabled = false;
+            userBlockButton.classList.remove('hidden-text');
+          };
+        });
+    });
+  </script>
+</body>
+</html>
